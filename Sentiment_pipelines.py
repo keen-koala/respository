@@ -53,27 +53,31 @@ for index, row in csv_input.iterrows():
     model_path = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
     sentiment_task_cardiff = pipeline("sentiment-analysis", model=model_path, tokenizer=model_path)
     cardiff_sentiment_label = (sentiment_task_cardiff(sentence_no_acccents)[0]['label'])
-    print('Cardiff NLP: ', str(cardiff_sentiment_label))
+
     if cardiff_sentiment_label== 'Neutral':
-        cardiff_sentiment_label== '0.0'
+        cardiff_sentiment_label= '0.0'
         Cardiff_NLP_list.append(cardiff_sentiment_label)
     elif cardiff_sentiment_label== 'Negative':
-        cardiff_sentiment_label == '-1.0'
+        cardiff_sentiment_label = '-1.0'
         Cardiff_NLP_list.append(cardiff_sentiment_label)
     else:
-        cardiff_sentiment_label == '-1.0'
+        cardiff_sentiment_label = '1.0'
         Cardiff_NLP_list.append(cardiff_sentiment_label)
+
+    print('Cardiff NLP: ', str(cardiff_sentiment_label))
 
 
     ''' NLP town Model '''  # Instantiate a pipeline object with our task and model passed as parameters,  #https://www.kdnuggets.com/2021/06/create-deploy-sentiment-analysis-app-api.html
 
     sentiment_task_nlptown = pipeline(task='sentiment-analysis',
                                       model='nlptown/bert-base-multilingual-uncased-sentiment')
-    nlp_town_sentiment_label = sentiment_task_nlptown(sentence_no_acccents)[0]['label']
+    nlp_town_sentiment_label = sentiment_task_nlptown(sentence_no_acccents)[0]['label']#.replace('star', '')
+    nlp_town_sentiment_label= re.sub("stars","", nlp_town_sentiment_label)
+    #print(nlp_town_sentiment_label)
     NLP_town_list.append(nlp_town_sentiment_label)
 
     # Pass the text to our pipeline and print the results
-    print('NLP town', f'{nlp_town_sentiment_label}')
+    print('NLP town: ', str(nlp_town_sentiment_label))
 
     ''' Using Vader'''  # https://github.com/cjhutto/vaderSentiment
     # using vader multihttps://pypi.org/project/vader-multi/
@@ -84,15 +88,15 @@ for index, row in csv_input.iterrows():
     Vader_list.append(vader_sentiment_label)
     print('Vader: ', vader_sentiment_label)
 
-#print(NLP_town_list)
-#print(Cardiff_NLP_list)
-#print(Vader_list)
+print(NLP_town_list)
+print(Cardiff_NLP_list)
+print(Vader_list)
 
-
-csv_input['NLP_town'] = [label for label in NLP_town_list]
+# add new columns in dataframe with sentiment, then the are saved in new csv
+csv_input['NLP_town_stars'] = [label for label in NLP_town_list]
 csv_input['Cardiff_NLP'] = [label for label in Cardiff_NLP_list]
 csv_input['Vader'] = [label for label in Vader_list]
-csv_input.to_csv('sentiment_test_short_labels.csv', index=False)
+#csv_input.to_csv('sentiment_test_short_labels.csv', index=False)
 
 
 
